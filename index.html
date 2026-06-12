@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Атлас мира - Политика, Ресурсы, Рельеф</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2a4a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .atlas-container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(10, 20, 30, 0.8);
+            backdrop-filter: blur(3px);
+            border-radius: 40px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            padding: 20px;
+            border: 2px solid #c9a03d;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #f5d742, #c99e2f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sub {
+            color: #b8c7e7;
+            font-size: 1rem;
+        }
+
+        .map-switcher {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .map-btn {
+            background: #1e2a3a;
+            border: 2px solid #c9a03d;
+            color: #e8d5a8;
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 10px 28px;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .map-btn.active {
+            background: linear-gradient(135deg, #c9a03d, #a07828);
+            color: #1a1a2e;
+            box-shadow: 0 0 15px rgba(201, 160, 61, 0.5);
+        }
+
+        .map-container {
+            background: #0a0f1a;
+            border-radius: 30px;
+            padding: 15px;
+            border: 1px solid #c9a03d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 500px;
+        }
+
+        .map-image {
+            display: none;
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .map-image.active {
+            display: block;
+        }
+
+        .legend {
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            padding: 12px 20px;
+            border: 1px solid #c9a03d;
+        }
+
+        .legend-title {
+            color: #f5d742;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ddd;
+            font-size: 0.85rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .info-panel {
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 10px 20px;
+            text-align: center;
+            color: #c9d1d9;
+        }
+
+        @media (max-width: 700px) {
+            .map-btn { font-size: 1rem; padding: 6px 16px; }
+            .header h1 { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="atlas-container">
+    <div class="header">
+        <h1>🌍 МИРОВОЙ АТЛАС 🌏</h1>
+        <div class="sub">Исследуй карты — переключай слои</div>
+    </div>
+
+    <div class="map-switcher">
+        <button class="map-btn" data-map="political">🗺️ ПОЛИТИЧЕСКАЯ</button>
+        <button class="map-btn active" data-map="resources">⚒️ РЕСУРСЫ</button>
+        <button class="map-btn" data-map="terrain">⛰️ РЕЛЬЕФ</button>
+    </div>
+
+    <div class="map-container">
+        <!-- ПОЛИТИЧЕСКАЯ КАРТА (пока заглушка) -->
+        <img id="politicalImg" class="map-image" src="" alt="Политическая карта">
+        
+        <!-- ВАША КАРТА РЕСУРСОВ ⭐ СЮДА ⭐ -->
+        <img id="resourcesImg" class="map-image active" src="image.png" alt="Карта ресурсов">
+        
+        <!-- КАРТА РЕЛЬЕФА (пока заглушка) -->
+        <img id="terrainImg" class="map-image" src="" alt="Карта рельефа">
+    </div>
+
+    <div class="legend" id="legendPanel">
+        <div class="legend-title">⚒️ КАРТА РЕСУРСОВ</div>
+        <div class="legend-items">
+            <div class="legend-item"><div class="legend-color" style="background:#2e7d32;"></div><span>🌲 Лес (дерево) — 500</span></div>
+            <div class="legend-item"><div class="legend-color" style="background:#808080;"></div><span>🔩 Вольфрам — 600</span></div>
+            <div class="legend-item"><div class="legend-color" style="background:#b87333;"></div><span>🟠 Медь — 400</span></div>
+            <div class="legend-item"><div class="legend-color" style="background:#e0e0e0;"></div><span>🧴 Пластик — 300</span></div>
+            <div class="legend-item"><div class="legend-color" style="background:#4a6c8f;"></div><span>⚙️ Сталь — 400</span></div>
+            <div class="legend-item"><div class="legend-color" style="background:#ffd700;"></div><span>⭐ Доп. ресурс — 500</span></div>
+        </div>
+    </div>
+    <div class="info-panel" id="infoPanel">
+        📍 Текущий слой: КАРТА РЕСУРСОВ — показаны месторождения и запасы
+    </div>
+</div>
+
+<script>
+    let currentMap = 'resources';
+
+    const politicalImg = document.getElementById('politicalImg');
+    const resourcesImg = document.getElementById('resourcesImg');
+    const terrainImg = document.getElementById('terrainImg');
+
+
+    politicalImg.src = "";      
+    resourcesImg.src = "https://media.discordapp.net/attachments/1369281756275933197/1369405136899670066/image.png?ex=6a2d0faa&is=6a2bbe2a&hm=495b5df89e2754394c56b6868f91a209e11be911f6726ff75c0fe7bd380becf8&=&format=webp&quality=lossless&width=976&height=482";  //  КАРТА РЕСУРСОВ
+    terrainImg.src = "";   
+
+    function setMapType(type) {
+        currentMap = type;
+        
+        politicalImg.classList.remove('active');
+        resourcesImg.classList.remove('active');
+        terrainImg.classList.remove('active');
+        
+        if (type === 'political') {
+            politicalImg.classList.add('active');
+            document.getElementById('legendPanel').innerHTML = `
+                <div class="legend-title">🗺️ ПОЛИТИЧЕСКАЯ КАРТА</div>
+                <div class="legend-items">
+                    <div class="legend-item"><div class="legend-color" style="background:#2e7d32;"></div><span>Государства</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#d32f2f;"></div><span>Столицы</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#2196f3;"></div><span>Границы</span></div>
+                </div>
+            `;
+            document.getElementById('infoPanel').innerHTML = '🗺️ Политическая карта — границы государств, столицы, крупные города';
+        } else if (type === 'resources') {
+            resourcesImg.classList.add('active');
+            document.getElementById('legendPanel').innerHTML = `
+                <div class="legend-title">⚒️ КАРТА РЕСУРСОВ</div>
+                <div class="legend-items">
+                    <div class="legend-item"><div class="legend-color" style="background:#2e7d32;"></div><span>🌲 Лес (дерево) — 500</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#808080;"></div><span>🔩 Вольфрам — 600</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#b87333;"></div><span>🟠 Медь — 400</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#e0e0e0;"></div><span>🧴 Пластик — 300</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#4a6c8f;"></div><span>⚙️ Сталь — 400</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#ffd700;"></div><span>⭐ Доп. ресурс — 500</span></div>
+                </div>
+            `;
+            document.getElementById('infoPanel').innerHTML = '📊 Карта ресурсов — месторождения: дерево(500), вольфрам(600), медь(400), пластик(300), сталь(400)';
+        } else if (type === 'terrain') {
+            terrainImg.classList.add('active');
+            document.getElementById('legendPanel').innerHTML = `
+                <div class="legend-title">⛰️ КАРТА РЕЛЬЕФА</div>
+                <div class="legend-items">
+                    <div class="legend-item"><div class="legend-color" style="background:#8B5A2B;"></div><span>Горы</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#228B22;"></div><span>Леса</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#F5DEB3;"></div><span>Пустыни</span></div>
+                </div>
+            `;
+            document.getElementById('infoPanel').innerHTML = '⛰️ Карта рельефа — горные системы, равнины, природные зоны';
+        }
+        
+        document.querySelectorAll('.map-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-map') === type);
+        });
+        
+        const container = document.querySelector('.map-container');
+        container.style.transform = 'scale(0.98)';
+        setTimeout(() => container.style.transform = 'scale(1)', 150);
+    }
+
+    document.querySelectorAll('.map-btn').forEach(btn => {
+        btn.addEventListener('click', () => setMapType(btn.getAttribute('data-map')));
+    });
+
+    resourcesImg.onload = () => console.log('✅ Ваша карта ресурсов загружена!');
+    resourcesImg.onerror = () => console.error('❌ Карта не найдена! Проверьте: файл "image.png" лежит рядом с index.html');
+</script>
+</body>
+</html>
