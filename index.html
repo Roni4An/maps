@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Атлас мира - Политика, Ресурсы, Рельеф | Рисование на картах</title>
+    <title>Атлас мира - Политика, Ресурсы, Энергоресурсы, Рельеф</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
         }
 
         body {
@@ -22,7 +23,7 @@
         }
 
         .atlas-container {
-            max-width: 1400px;
+            max-width: 1300px;
             width: 100%;
             background: rgba(10, 20, 30, 0.8);
             backdrop-filter: blur(3px);
@@ -34,11 +35,11 @@
 
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             background: linear-gradient(135deg, #f5d742, #c99e2f);
             -webkit-background-clip: text;
             background-clip: text;
@@ -47,46 +48,139 @@
 
         .sub {
             color: #b8c7e7;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
-        .main-content {
+        /* Переключатели карт */
+        .map-switcher {
             display: flex;
-            gap: 20px;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
-        /* Панель рисования */
-        .draw-panel {
-            width: 140px;
-            background: rgba(0, 0, 0, 0.7);
+        .map-btn {
+            background: #1e2a3a;
+            border: 2px solid #c9a03d;
+            color: #e8d5a8;
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 8px 20px;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .map-btn.active {
+            background: linear-gradient(135deg, #c9a03d, #a07828);
+            color: #1a1a2e;
+            box-shadow: 0 0 12px rgba(201,160,61,0.5);
+        }
+
+        /* Контейнер карты */
+        .map-container {
+            background: #0a0f1a;
             border-radius: 30px;
-            padding: 15px 10px;
+            padding: 15px;
             border: 1px solid #c9a03d;
-            backdrop-filter: blur(5px);
             display: flex;
             flex-direction: column;
-            gap: 15px;
             align-items: center;
         }
 
-        .draw-panel h3 {
-            color: #f5d742;
-            font-size: 1rem;
+        .canvas-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
             text-align: center;
-            margin-bottom: 5px;
+        }
+
+        canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            cursor: crosshair;
+            margin: 0 auto;
+        }
+
+        /* Нижняя панель с кнопками */
+        .bottom-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn {
+            background: #2c5f8a;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .toggle-btn:hover {
+            transform: scale(1.02);
+            filter: brightness(1.1);
+        }
+
+        .toggle-btn.draw-btn {
+            background: #467a34;
+        }
+
+        .toggle-btn.hint-btn {
+            background: #8b5a2b;
+        }
+
+        /* Панель рисования (выезжает снизу) */
+        .draw-panel {
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 30px;
+            padding: 12px 20px;
+            border: 1px solid #c9a03d;
+            backdrop-filter: blur(5px);
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .draw-panel.open {
+            display: flex;
+        }
+
+        .draw-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(30, 40, 50, 0.6);
+            padding: 5px 12px;
+            border-radius: 40px;
+        }
+
+        .draw-section h4 {
+            color: #f5d742;
+            font-size: 0.8rem;
         }
 
         .color-picker {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
+            gap: 6px;
         }
 
         .color-option {
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid #fff;
@@ -94,25 +188,19 @@
         }
 
         .color-option.active {
-            transform: scale(1.2);
+            transform: scale(1.15);
             border-color: #ffd700;
             box-shadow: 0 0 5px gold;
-        }
-
-        .brush-size {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
         }
 
         .size-btn {
             background: #2e3a4a;
             border: none;
             color: white;
-            padding: 5px 12px;
+            padding: 4px 12px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
         }
 
         .size-btn.active {
@@ -123,11 +211,11 @@
         .action-btn {
             background: #467a34;
             border: none;
-            padding: 8px 15px;
+            padding: 5px 12px;
             border-radius: 30px;
             color: white;
             cursor: pointer;
-            width: 100%;
+            font-size: 0.75rem;
             font-weight: bold;
         }
 
@@ -139,90 +227,42 @@
             background: #2c5f8a;
         }
 
-        /* Контейнер карты */
-        .map-wrapper {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .map-switcher {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .map-btn {
-            background: #1e2a3a;
-            border: 2px solid #c9a03d;
-            color: #e8d5a8;
-            font-size: 0.9rem;
-            font-weight: bold;
-            padding: 6px 14px;
-            border-radius: 60px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .map-btn.active {
-            background: linear-gradient(135deg, #c9a03d, #a07828);
-            color: #1a1a2e;
-        }
-
-        .map-container {
-            background: #0a0f1a;
-            border-radius: 30px;
-            padding: 15px;
-            border: 1px solid #c9a03d;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-        }
-
-        .canvas-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        canvas {
-            display: block;
-            max-width: 100%;
-            height: auto;
+        /* Картинка-подсказка */
+        .hint-panel {
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.7);
             border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-            cursor: crosshair;
-        }
-
-        /* Картинка-подсказка для ресурсов */
-        .hint-image {
-            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #c9a03d;
+            display: none;
             text-align: center;
         }
 
-        .hint-image img {
-            max-width: 100%;
-            max-height: 150px;
-            border-radius: 15px;
-            border: 1px solid #c9a03d;
-            cursor: pointer;
+        .hint-panel.open {
+            display: block;
         }
 
+        .hint-panel img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 15px;
+        }
+
+        /* Легенда и информация */
         .legend {
-            margin-top: 20px;
+            margin-top: 15px;
             background: rgba(0, 0, 0, 0.6);
             border-radius: 20px;
-            padding: 10px 15px;
+            padding: 8px 15px;
             border: 1px solid #c9a03d;
         }
 
         .legend-title {
             color: #f5d742;
             font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .legend-items {
@@ -235,37 +275,32 @@
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             color: #ddd;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
 
         .legend-color {
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             border-radius: 3px;
         }
 
         .info-panel {
-            margin-top: 12px;
+            margin-top: 10px;
             background: rgba(0, 0, 0, 0.5);
             border-radius: 15px;
-            padding: 8px 15px;
+            padding: 6px 12px;
             text-align: center;
             color: #c9d1d9;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
-        @media (max-width: 800px) {
-            .draw-panel {
-                width: 100%;
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .main-content {
-                flex-direction: column;
-            }
+        @media (max-width: 700px) {
+            .draw-panel { flex-direction: column; align-items: stretch; }
+            .draw-section { justify-content: space-between; }
+            .map-btn { padding: 5px 12px; font-size: 0.75rem; }
+            .header h1 { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -273,13 +308,32 @@
 <div class="atlas-container">
     <div class="header">
         <h1>🌍 МИРОВОЙ АТЛАС 🌏</h1>
-        <div class="sub">Исследуй карты • Рисуй • Сохраняй свои пометки</div>
+        <div class="sub">Исследуй карты • Рисуй • Сохраняй пометки</div>
     </div>
 
-    <div class="main-content">
-        <!-- Панель рисования -->
-        <div class="draw-panel">
-            <h3>🎨 РИСОВАНИЕ</h3>
+    <div class="map-switcher" id="mapSwitcher">
+        <button class="map-btn" data-map="political">🗺️ ПОЛИТИЧЕСКАЯ</button>
+        <button class="map-btn active" data-map="resources">⚒️ РЕСУРСЫ</button>
+        <button class="map-btn" data-map="fuels">🛢️ ЭНЕРГОРЕСЫ</button>
+        <button class="map-btn" data-map="terrain">⛰️ РЕЛЬЕФ</button>
+    </div>
+
+    <div class="map-container">
+        <div class="canvas-container">
+            <canvas id="mapCanvas" width="1000" height="600" style="width:100%; height:auto; max-width:1000px; aspect-ratio:1000/600"></canvas>
+        </div>
+    </div>
+
+    <!-- Нижние кнопки -->
+    <div class="bottom-bar">
+        <button class="toggle-btn draw-btn" id="toggleDrawBtn">🎨 РИСОВАНИЕ</button>
+        <button class="toggle-btn hint-btn" id="toggleHintBtn">❔ ПОДСКАЗКА</button>
+    </div>
+
+    <!-- Панель рисования -->
+    <div class="draw-panel" id="drawPanel">
+        <div class="draw-section">
+            <h4>🎨 Цвет:</h4>
             <div class="color-picker" id="colorPicker">
                 <div class="color-option active" style="background:#ff0000;" data-color="#ff0000"></div>
                 <div class="color-option" style="background:#00ff00;" data-color="#00ff00"></div>
@@ -290,38 +344,27 @@
                 <div class="color-option" style="background:#ffa500;" data-color="#ffa500"></div>
                 <div class="color-option" style="background:#000000;" data-color="#000000"></div>
             </div>
-            <h3>📏 КИСТЬ</h3>
-            <div class="brush-size" id="brushSize">
-                <button class="size-btn" data-size="3">Маленькая</button>
-                <button class="size-btn active" data-size="6">Средняя</button>
-                <button class="size-btn" data-size="12">Большая</button>
-            </div>
-            <button class="action-btn" id="eraserBtn">🧽 ЛАСТИК</button>
-            <button class="action-btn clear-btn" id="clearCanvasBtn">🗑 ОЧИСТИТЬ ВСЁ</button>
-            <button class="action-btn save-btn" id="saveDrawingBtn">💾 СОХРАНИТЬ РИСУНОК</button>
         </div>
-
-        <div class="map-wrapper">
-            <div class="map-switcher" id="mapSwitcher">
-                <button class="map-btn" data-map="political">🗺️ ПОЛИТИЧЕСКАЯ</button>
-                <button class="map-btn" data-map="resources">⚒️ РЕСУРСЫ</button>
-                <button class="map-btn" data-map="fuels">🛢️ НЕФТЬ/ГАЗ/УРАН</button>
-                <button class="map-btn" data-map="terrain">⛰️ РЕЛЬЕФ</button>
-            </div>
-            <div class="map-container">
-                <div class="canvas-container">
-                    <canvas id="mapCanvas" width="1000" height="600" style="width:100%; height:auto; max-width:1000px; aspect-ratio:1000/600"></canvas>
-                </div>
-                <!-- Картинка-подсказка (только для ресурсов) -->
-                <div id="hintContainer" class="hint-image" style="display: none;">
-                    <img id="hintImage" src="https://media.discordapp.net/attachments/1218513540189782016/1514940289171849296/image-10.png?ex=6a2d3197&is=6a2be017&hm=3798c6408b887f9f26320eef7b82a7a334451a950b7e158480d179cbc3d4f62e&=&format=webp&quality=lossless&width=976&height=669" alt="Подсказка">
-                </div>
-            </div>
+        <div class="draw-section">
+            <h4>✏️ Кисть:</h4>
+            <button class="size-btn" data-size="3">Малая</button>
+            <button class="size-btn active" data-size="6">Средняя</button>
+            <button class="size-btn" data-size="12">Большая</button>
+        </div>
+        <div class="draw-section">
+            <button class="action-btn" id="eraserBtn">🧽 ЛАСТИК</button>
+            <button class="action-btn clear-btn" id="clearCanvasBtn">🗑 ОЧИСТИТЬ</button>
+            <button class="action-btn save-btn" id="saveDrawingBtn">💾 СОХРАНИТЬ PNG</button>
         </div>
     </div>
 
+    <!-- Панель подсказки -->
+    <div class="hint-panel" id="hintPanel">
+        <img id="hintImage" src="https://media.discordapp.net/attachments/1218513540189782016/1514940289171849296/image-10.png?ex=6a2d3197&is=6a2be017&hm=3798c6408b887f9f26320eef7b82a7a334451a950b7e158480d179cbc3d4f62e&=&format=webp&quality=lossless&width=976&height=669" alt="Подсказка по ресурсам">
+    </div>
+
     <div class="legend" id="legendPanel"></div>
-    <div class="info-panel" id="infoPanel">🎨 Выберите цвет и кисть, рисуйте прямо на карте!</div>
+    <div class="info-panel" id="infoPanel">🎨 Нажмите «Рисование» для пометок на карте</div>
 </div>
 
 <script>
@@ -329,17 +372,13 @@
     const canvas = document.getElementById('mapCanvas');
     const ctx = canvas.getContext('2d');
     
-    // Размеры canvas
     canvas.width = 1000;
     canvas.height = 600;
     
-    // Состояние рисования
     let isDrawing = false;
     let currentColor = '#ff0000';
     let currentBrushSize = 6;
     let isErasing = false;
-    
-    // Текущая карта
     let currentMap = 'resources';
     
     // Загруженные изображения карт
@@ -350,47 +389,40 @@
         terrain: new Image()
     };
     
-    // Ссылки на карты
+    // Ссылки на карты (можно заменить на вечные)
     mapImages.political.src = "https://cdn.discordapp.com/attachments/1218513540189782016/1514940215771402313/20_20260612132822.png?ex=6a2d3185&is=6a2be005&hm=b7ffdeca059b0937a2534ba2dba79d5e42de6e803549a85e73c288af3d9f355b";
     mapImages.resources.src = "https://media.discordapp.net/attachments/1369281756275933197/1369405136899670066/image.png?ex=6a2d0faa&is=6a2bbe2a&hm=495b5df89e2754394c56b6868f91a209e11be911f6726ff75c0fe7bd380becf8&=&format=webp&quality=lossless&width=976&height=482";
     mapImages.fuels.src = "https://media.discordapp.net/attachments/1218513540189782016/1514940289968640020/image-9.png?ex=6a2d3197&is=6a2be017&hm=97d5a82d324e759ca585bd15a6eadacd854f585186202a67773e64dfdc5fdd2e&=&format=webp&quality=lossless&width=976&height=482";
-    mapImages.terrain.src = ""; // пока пусто, можно добавить позже
+    mapImages.terrain.src = "";
     
-    // Ждём загрузки всех карт
     let loadedCount = 0;
-    const totalMaps = 3; // политическая, ресурсы, нефть (рельеф пока пустой)
+    const totalMaps = 3;
     
     function checkAllLoaded() {
         loadedCount++;
-        if (loadedCount >= totalMaps) {
-            drawCurrentMap();
-        }
+        if (loadedCount >= totalMaps) drawCurrentMap();
     }
     
     mapImages.political.onload = checkAllLoaded;
     mapImages.resources.onload = checkAllLoaded;
     mapImages.fuels.onload = checkAllLoaded;
-    mapImages.terrain.onload = () => drawCurrentMap();
     
-    // Если картинки из кэша
     if (mapImages.political.complete) loadedCount++;
     if (mapImages.resources.complete) loadedCount++;
     if (mapImages.fuels.complete) loadedCount++;
     
-    // Функция отрисовки текущей карты
     function drawCurrentMap() {
         const img = mapImages[currentMap];
         if (img && img.src && img.complete) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         } else if (currentMap === 'terrain') {
-            // Заглушка для рельефа
             ctx.fillStyle = '#2a4a2a';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#6a9a6a';
             ctx.font = '24px sans-serif';
             ctx.fillText('🗺️ КАРТА РЕЛЬЕФА', canvas.width/2 - 150, canvas.height/2);
-            ctx.fillText('(добавьте своё изображение)', canvas.width/2 - 150, canvas.height/2 + 40);
+            ctx.fillText('(добавьте своё изображение)', canvas.width/2 - 180, canvas.height/2 + 40);
         } else {
             ctx.fillStyle = '#1a2a3a';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -398,24 +430,20 @@
             ctx.font = '20px sans-serif';
             ctx.fillText('Загрузка карты...', canvas.width/2 - 100, canvas.height/2);
         }
-        // Восстанавливаем сохранённые рисунки для этой карты
         restoreDrawingForCurrentMap();
     }
     
-    // ---------- СОХРАНЕНИЕ РИСУНКОВ (localStorage) ----------
+    // Сохранение рисунков
     function saveDrawingToStorage() {
-        const drawingData = canvas.toDataURL();
-        localStorage.setItem(`drawing_${currentMap}`, drawingData);
+        localStorage.setItem(`drawing_${currentMap}`, canvas.toDataURL());
     }
     
     function restoreDrawingForCurrentMap() {
-        const savedDrawing = localStorage.getItem(`drawing_${currentMap}`);
-        if (savedDrawing) {
+        const saved = localStorage.getItem(`drawing_${currentMap}`);
+        if (saved) {
             const img = new Image();
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0);
-            };
-            img.src = savedDrawing;
+            img.onload = () => ctx.drawImage(img, 0, 0);
+            img.src = saved;
         }
     }
     
@@ -431,12 +459,11 @@
         link.click();
     }
     
-    // ---------- РИСОВАНИЕ ----------
+    // Рисование
     function getCanvasCoords(e) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        
         let clientX, clientY;
         if (e.touches) {
             clientX = e.touches[0].clientX;
@@ -446,7 +473,6 @@
             clientX = e.clientX;
             clientY = e.clientY;
         }
-        
         let x = (clientX - rect.left) * scaleX;
         let y = (clientY - rect.top) * scaleY;
         x = Math.max(0, Math.min(canvas.width, x));
@@ -457,54 +483,36 @@
     function draw(e) {
         if (!isDrawing) return;
         e.preventDefault();
-        
         const { x, y } = getCanvasCoords(e);
-        
         ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
         ctx.beginPath();
         ctx.arc(x, y, currentBrushSize / 2, 0, Math.PI * 2);
-        if (!isErasing) {
-            ctx.fillStyle = currentColor;
-        }
+        if (!isErasing) ctx.fillStyle = currentColor;
         ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
     }
     
-    function startDrawing(e) {
-        isDrawing = true;
-        draw(e);
-    }
+    function startDrawing(e) { isDrawing = true; draw(e); }
+    function stopDrawing() { isDrawing = false; saveDrawingToStorage(); }
     
-    function stopDrawing() {
-        isDrawing = false;
-        saveDrawingToStorage();
-    }
-    
-    // События мыши
     canvas.addEventListener('mousedown', startDrawing);
     canvas.addEventListener('mousemove', draw);
     canvas.addEventListener('mouseup', stopDrawing);
     canvas.addEventListener('mouseleave', stopDrawing);
-    
-    // Сенсорные события
     canvas.addEventListener('touchstart', startDrawing);
     canvas.addEventListener('touchmove', draw);
     canvas.addEventListener('touchend', stopDrawing);
     
-    // ---------- ИНТЕРФЕЙС ----------
-    // Выбор цвета
+    // Интерфейс
     document.querySelectorAll('.color-option').forEach(opt => {
         opt.addEventListener('click', () => {
             document.querySelectorAll('.color-option').forEach(o => o.classList.remove('active'));
             opt.classList.add('active');
             currentColor = opt.dataset.color;
             isErasing = false;
-            document.getElementById('eraserBtn').style.opacity = '0.7';
-            document.getElementById('eraserBtn').style.background = '#8b3a3a';
         });
     });
     
-    // Размер кисти
     document.querySelectorAll('.size-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
@@ -513,50 +521,32 @@
         });
     });
     
-    // Ластик
-    const eraserBtn = document.getElementById('eraserBtn');
-    eraserBtn.addEventListener('click', () => {
+    document.getElementById('eraserBtn').addEventListener('click', () => {
         isErasing = true;
-        eraserBtn.style.opacity = '1';
-        eraserBtn.style.background = '#c9a03d';
-        eraserBtn.style.color = '#1a1a2e';
+        const btn = document.getElementById('eraserBtn');
+        btn.style.background = '#c9a03d';
+        btn.style.color = '#1a1a2e';
         setTimeout(() => {
-            eraserBtn.style.opacity = '0.7';
-            eraserBtn.style.background = '#8b3a3a';
-            eraserBtn.style.color = 'white';
-        }, 300);
+            btn.style.background = '#467a34';
+            btn.style.color = 'white';
+        }, 200);
     });
     
-    // Очистить всё
     document.getElementById('clearCanvasBtn').addEventListener('click', () => {
-        if (confirm('Очистить все рисунки на этой карте?')) {
-            clearCurrentDrawing();
-        }
+        if (confirm('Очистить все рисунки на этой карте?')) clearCurrentDrawing();
     });
     
-    // Сохранить рисунок как изображение
     document.getElementById('saveDrawingBtn').addEventListener('click', () => {
         saveDrawingAsImage();
-        alert('✅ Рисунок сохранён как PNG!');
+        alert('✅ Рисунок сохранён!');
     });
     
     // Переключение карт
     function setMapType(type) {
         currentMap = type;
-        
-        // Обновить активную кнопку
         document.querySelectorAll('.map-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.map === type);
         });
-        
-        // Показать/скрыть подсказку (только для ресурсов)
-        const hintContainer = document.getElementById('hintContainer');
-        if (type === 'resources') {
-            hintContainer.style.display = 'block';
-        } else {
-            hintContainer.style.display = 'none';
-        }
-        
         drawCurrentMap();
         updateLegendAndInfo();
     }
@@ -567,12 +557,12 @@
         
         if (currentMap === 'political') {
             legendPanel.innerHTML = `<div class="legend-title">🗺️ ПОЛИТИЧЕСКАЯ КАРТА</div><div class="legend-items"><div class="legend-item"><div class="legend-color" style="background:#2e7d32;"></div><span>Государства</span></div><div class="legend-item"><div class="legend-color" style="background:#d32f2f;"></div><span>Столицы</span></div><div class="legend-item"><div class="legend-color" style="background:#2196f3;"></div><span>Границы</span></div></div>`;
-            infoPanel.innerHTML = '🗺️ Политическая карта — границы государств, столицы, крупные города | Рисуйте сверху!';
+            infoPanel.innerHTML = '🗺️ Политическая карта — границы государств, столицы, крупные города';
         } else if (currentMap === 'resources') {
-            legendPanel.innerHTML = `<div class="legend-title">⚒️ КАРТА РЕСУРСОВ</div><div class="legend-items"><div class="legend-item"><div class="legend-color" style="background:#2e7d32;"></div><span>🌲 Лес (дерево) — 500</span></div><div class="legend-item"><div class="legend-color" style="background:#808080;"></div><span>🔩 Вольфрам — 600</span></div><div class="legend-item"><div class="legend-color" style="background:#b87333;"></div><span>🟠 Медь — 400</span></div><div class="legend-item"><div class="legend-color" style="background:#e0e0e0;"></div><span>🧴 Пластик — 300</span></div><div class="legend-item"><div class="legend-color" style="background:#4a6c8f;"></div><span>⚙️ Сталь — 400</span></div><div class="legend-item"><div class="legend-color" style="background:#ffd700;"></div><span>⭐ Доп. ресурс — 500</span></div></div>`;
+            legendPanel.innerHTML = `<div class="legend-title">⚒️ КАРТА РЕСУРСОВ</div><div class="legend-items"><div class="legend-item"><div class="legend-color" style="background:#2e7d32;"></div><span>🌲 Лес (дерево) — 500</span></div><div class="legend-item"><div class="legend-color" style="background:#808080;"></div><span>🔩 Вольфрам — 600</span></div><div class="legend-item"><div class="legend-color" style="background:#b87333;"></div><span>🟠 Медь — 400</span></div><div class="legend-item"><div class="legend-color" style="background:#e0e0e0;"></div><span>🧴 Пластик — 300</span></div><div class="legend-item"><div class="legend-color" style="background:#4a6c8f;"></div><span>⚙️ Сталь — 400</span></div></div>`;
             infoPanel.innerHTML = '📊 Карта ресурсов — месторождения: дерево(500), вольфрам(600), медь(400), пластик(300), сталь(400)';
         } else if (currentMap === 'fuels') {
-            legendPanel.innerHTML = `<div class="legend-title">🛢️ КАРТА НЕФТИ, ГАЗА И УРАНА</div><div class="legend-items"><div class="legend-item"><div class="legend-color" style="background:#2e7d32;"></div><span>Нефтяные месторождения</span></div><div class="legend-item"><div class="legend-color" style="background:#ff9800;"></div><span>Газовые месторождения</span></div><div class="legend-item"><div class="legend-color" style="background:#9c27b0;"></div><span>Урановые рудники</span></div></div>`;
+            legendPanel.innerHTML = `<div class="legend-title">🛢️ КАРТА ЭНЕРГОРЕСУРСОВ</div><div class="legend-items"><div class="legend-item"><div class="legend-color" style="background:#2e7d32;"></div><span>Нефтяные месторождения</span></div><div class="legend-item"><div class="legend-color" style="background:#ff9800;"></div><span>Газовые месторождения</span></div><div class="legend-item"><div class="legend-color" style="background:#9c27b0;"></div><span>Урановые рудники</span></div></div>`;
             infoPanel.innerHTML = '🛢️ Карта энергоресурсов — нефть, газ и уран по всему миру';
         } else {
             legendPanel.innerHTML = `<div class="legend-title">⛰️ КАРТА РЕЛЬЕФА</div><div class="legend-items"><div class="legend-item"><div class="legend-color" style="background:#8B5A2B;"></div><span>Горы</span></div><div class="legend-item"><div class="legend-color" style="background:#228B22;"></div><span>Леса</span></div><div class="legend-item"><div class="legend-color" style="background:#F5DEB3;"></div><span>Пустыни</span></div></div>`;
@@ -580,15 +570,26 @@
         }
     }
     
-    // Обработчики кнопок карт
     document.querySelectorAll('.map-btn').forEach(btn => {
         btn.addEventListener('click', () => setMapType(btn.dataset.map));
     });
     
-    // Показываем подсказку при старте
-    document.getElementById('hintContainer').style.display = 'block';
+    // Открытие/закрытие панелей
+    const drawPanel = document.getElementById('drawPanel');
+    const hintPanel = document.getElementById('hintPanel');
+    const toggleDrawBtn = document.getElementById('toggleDrawBtn');
+    const toggleHintBtn = document.getElementById('toggleHintBtn');
     
-    // Запуск
+    toggleDrawBtn.addEventListener('click', () => {
+        drawPanel.classList.toggle('open');
+        toggleDrawBtn.style.background = drawPanel.classList.contains('open') ? '#6ca34d' : '#467a34';
+    });
+    
+    toggleHintBtn.addEventListener('click', () => {
+        hintPanel.classList.toggle('open');
+        toggleHintBtn.style.background = hintPanel.classList.contains('open') ? '#c97e2a' : '#8b5a2b';
+    });
+    
     setTimeout(() => drawCurrentMap(), 100);
     updateLegendAndInfo();
 </script>
